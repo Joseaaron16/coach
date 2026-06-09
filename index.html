@@ -700,7 +700,6 @@ if (!state.tareas)        state.tareas = {};
 if (!state.pilares)       state.pilares = {};
 if (!state.racha)         state.racha = [];
 if (!state.habitoHist)    state.habitoHist = {};
-if (!state.habitoCounters) state.habitoCounters = {};
 if (!state.lastReset)     state.lastReset = hoyKey();
 
 // ── UTILIDADES ──────────────────────────────────────────
@@ -795,9 +794,9 @@ const HABITOS = [
   { id:'gym',       icon:'🏋️', name:'Gym / ejercicio',           sub:'Mínimo 45 min de movimiento' },
   { id:'proteina',  icon:'🥩', name:'Proteína en cada comida',  sub:'Pollo, huevo, carne, atún…' },
   { id:'agua',      icon:'💧', name:'Tomar 2.5L de agua',       sub:'Hidratación = energía y salud' },
-  { id:'leer',      icon:'📚', name:'Leer 20 min',              sub:'Libros de ventas, negocios o mente', counter:true, counterLabel:'páginas hoy', counterKey:'leer_pags' },
+  { id:'leer',      icon:'📚', name:'Leer 20 min',              sub:'Libros de ventas, negocios, mente' },
   { id:'practicar', icon:'🎯', name:'Practicar una habilidad',  sub:'Ventas, presentaciones, contenido' },
-  { id:'prospectar',icon:'📞', name:'Hablar con personas / Prospectar', sub:'Conversa, agrega valor, agenda citas PPR', counter:true, counterLabel:'personas hoy', counterKey:'prosp_count' },
+  { id:'prospectar',icon:'📞', name:'Prospectar PPR (3+)',       sub:'Mínimo 3 contactos al día' },
   { id:'contenido', icon:'🎬', name:'Crear contenido',          sub:'TikTok, Instagram o idea nueva' },
   { id:'nocelular', icon:'📵', name:'Sin celular antes de dormir',sub:'30 min sin pantallas' },
   { id:'reflexion', icon:'📝', name:'Reflexión nocturna',        sub:'¿Qué logré hoy? ¿Qué mejorar?' },
@@ -805,22 +804,18 @@ const HABITOS = [
 ];
 
 const LOGROS = [
-  { id:'primero',   icon:'🌱', label:'Primer día',            cond:s=>s.totalDays>=1 },
-  { id:'semana',    icon:'🔥', label:'Semana completa',       cond:s=>s.streak>=7 },
-  { id:'quincena',  icon:'💪', label:'15 días seguidos',      cond:s=>s.streak>=15 },
-  { id:'mes',       icon:'🏆', label:'Un mes de racha',       cond:s=>s.streak>=30 },
-  { id:'gym7',      icon:'🏋️', label:'Gym 7 veces',           cond:s=>(s.perH['gym']||0)>=7 },
-  { id:'gym30',     icon:'🦾', label:'Gym 30 veces',          cond:s=>(s.perH['gym']||0)>=30 },
-  { id:'leer7',     icon:'📖', label:'Leer 7 días',           cond:s=>(s.perH['leer']||0)>=7 },
-  { id:'leer21',    icon:'🧠', label:'Leer 21 días',          cond:s=>(s.perH['leer']||0)>=21 },
-  { id:'leer30',    icon:'🎓', label:'Lector de élite (30d)', cond:s=>(s.perH['leer']||0)>=30 },
-  { id:'prosp5',    icon:'🗣️', label:'5 días prospectando',   cond:s=>(s.perH['prospectar']||0)>=5 },
-  { id:'prosp10',   icon:'💼', label:'10 días prospectando',  cond:s=>(s.perH['prospectar']||0)>=10 },
-  { id:'prosp30',   icon:'🏅', label:'Prospectador élite (30d)', cond:s=>(s.perH['prospectar']||0)>=30 },
-  { id:'cont7',     icon:'🎬', label:'Contenido 7 días',      cond:s=>(s.perH['contenido']||0)>=7 },
-  { id:'agua7',     icon:'💧', label:'Agua 7 días',           cond:s=>(s.perH['agua']||0)>=7 },
-  { id:'perfecto',  icon:'⭐', label:'Día perfecto',          cond:s=>s.perfectDays>=1 },
-  { id:'perf5',     icon:'🌟', label:'5 días perfectos',      cond:s=>s.perfectDays>=5 },
+  { id:'primero',  icon:'🌱', label:'Primer día',       cond:s=>s.totalDays>=1 },
+  { id:'semana',   icon:'🔥', label:'Semana completa',  cond:s=>s.streak>=7 },
+  { id:'quincena', icon:'💪', label:'15 días seguidos', cond:s=>s.streak>=15 },
+  { id:'mes',      icon:'🏆', label:'Un mes de racha',  cond:s=>s.streak>=30 },
+  { id:'gym7',     icon:'🏋️', label:'Gym 7 veces',      cond:s=>(s.perH['gym']||0)>=7 },
+  { id:'gym30',    icon:'🦾', label:'Gym 30 veces',     cond:s=>(s.perH['gym']||0)>=30 },
+  { id:'leer7',    icon:'📖', label:'Leer 7 días',      cond:s=>(s.perH['leer']||0)>=7 },
+  { id:'prosp10',  icon:'💼', label:'10 días prospectando', cond:s=>(s.perH['prospectar']||0)>=10 },
+  { id:'cont7',    icon:'🎬', label:'Contenido 7 días', cond:s=>(s.perH['contenido']||0)>=7 },
+  { id:'agua7',    icon:'💧', label:'Agua 7 días',      cond:s=>(s.perH['agua']||0)>=7 },
+  { id:'perfecto', icon:'⭐', label:'Día perfecto',     cond:s=>s.perfectDays>=1 },
+  { id:'perf5',    icon:'🌟', label:'5 días perfectos', cond:s=>s.perfectDays>=5 },
 ];
 
 function getHabitosHoy() {
@@ -829,39 +824,7 @@ function getHabitosHoy() {
   return state.habitoHist[k];
 }
 
-function changeCounter(key, delta) {
-  const hoy = hoyKey();
-  if (!state.habitoCounters[hoy]) state.habitoCounters[hoy] = {};
-  const current = parseInt(state.habitoCounters[hoy][key] || '0');
-  const newVal = Math.max(0, current + delta);
-  state.habitoCounters[hoy][key] = newVal;
-  saveState(state);
-  const el = document.getElementById('cnt-'+key);
-  if (el) el.textContent = newVal;
-  // Auto-mark habito as done when counter > 0
-  if (newVal > 0) {
-    const habitoId = key === 'leer_pags' ? 'leer' : 'prospectar';
-    const hoyData = getHabitosHoy();
-    if (!hoyData[habitoId]) {
-      hoyData[habitoId] = true;
-      saveState(state);
-      renderHabitos();
-      renderLogros();
-    }
-  }
-  // Motivational messages at milestones
-  if (key === 'prosp_count') {
-    if (newVal === 3) addMsg('coach', '🔥 ¡3 personas contactadas! Ya cumpliste el mínimo del día. ¿Sigues para más?');
-    if (newVal === 5) addMsg('coach', '💼 ¡5 prospectos hoy! Eso es trabajo de élite. Salvador estaría orgulloso.');
-    if (newVal === 10) addMsg('coach', '🏆 ¡10 personas hoy! Eres una máquina de ventas. Así se construye un negocio.');
-  }
-  if (key === 'leer_pags') {
-    if (newVal === 10) addMsg('coach', '📚 10 páginas — buen inicio. Los líderes leen mínimo 20 páginas al día.');
-    if (newVal === 20) addMsg('coach', '🧠 ¡20 páginas! Eso es un libro cada 2 semanas. Tu mente se está expandiendo.');
-  }
-}
-
-
+function getHabitoStreak(id) {
   let streak = 0;
   const d = new Date();
   for (let i = 0; i < 90; i++) {
@@ -915,19 +878,6 @@ function renderHabitos() {
       semDays.push({ done:!!(state.habitoHist[k]&&state.habitoHist[k][h.id]), today:i===0 });
     }
     const semHTML = semDays.map(s=>'<div class="sem-day'+(s.done?' done':'')+(s.today?' today':'')+'"></div>').join('');
-
-    // Counter for leer/prospectar
-    let counterHTML = '';
-    if (h.counter) {
-      const savedVal = (state.habitoCounters && state.habitoCounters[hoyKey()] && state.habitoCounters[hoyKey()][h.counterKey]) || '';
-      counterHTML = '<div style="display:flex;align-items:center;gap:6px;margin-top:6px">'
-        + '<button onclick="event.stopPropagation();changeCounter(\''+h.counterKey+'\',-1)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">−</button>'
-        + '<span id="cnt-'+h.counterKey+'" style="font-family:\'Space Mono\',monospace;font-size:13px;font-weight:700;color:var(--accent2);min-width:24px;text-align:center">'+(savedVal||'0')+'</span>'
-        + '<button onclick="event.stopPropagation();changeCounter(\''+h.counterKey+'\',1)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">+</button>'
-        + '<span style="font-size:11px;color:var(--muted)">'+h.counterLabel+'</span>'
-        + '</div>';
-    }
-
     const row = document.createElement('div');
     row.className = 'habito-row'+(on?' habito-on':'');
     row.innerHTML =
@@ -935,7 +885,6 @@ function renderHabitos() {
       '<div class="habito-info">'+
         '<div class="habito-name">'+h.name+'</div>'+
         '<div class="habito-sub">'+h.sub+'</div>'+
-        counterHTML+
         '<div class="semana-mini">'+semHTML+'</div>'+
       '</div>'+
       '<div class="habito-right">'+
