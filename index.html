@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach Personal — José Aarón</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root {
+  --bg:#0a0a0f; --surface:#13131a; --surface2:#1c1c28; --border:#2a2a3d;
+  --accent:#7c5cfc; --accent2:#00e5a0; --fire:#ff6b35; --warn:#ffd166;
+  --text:#e8e8f0; --muted:#6b6b8a; --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
+.logo{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:12px}
+#fecha-hoy{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace}
+.racha-badge{display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,#ff6b35,#ffd166);color:#0a0a0f;font-size:12px;font-weight:700;padding:5px 10px;border-radius:20px;cursor:pointer}
+
+/* LAYOUT */
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+.section-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+
+/* SALUDO */
+.saludo{text-align:center;padding:32px 0 24px}
+.saludo h1{font-size:clamp(22px,5vw,36px);font-weight:700;background:linear-gradient(135deg,#7c5cfc,#00e5a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.saludo p{color:var(--muted);font-size:14px}
+
+/* PROGRESO */
+.progreso-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:32px}
+.progreso-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.progreso-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--accent2)}
+.bar-track{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .5s ease;width:0%}
+
+/* PILARES */
+.pilares-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:32px}
+.pilar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.pilar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.pilar.gym::before{background:var(--fire)} .pilar.food::before{background:var(--accent2)} .pilar.ventas::before{background:var(--accent)} .pilar.content::before{background:var(--warn)}
+.pilar:hover{transform:translateY(-3px);border-color:var(--accent)}
+.pilar.done{background:var(--surface2);border-color:var(--accent2)}
+.pilar.done .pilar-check{opacity:1}
+.pilar-icon{font-size:28px;margin-bottom:6px} .pilar-name{font-size:12px;font-weight:600}
+.pilar-check{position:absolute;top:8px;right:8px;font-size:14px;opacity:0;transition:opacity .2s}
+
+/* TAREAS */
+.tareas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:32px}
+.tarea-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.tarea-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600}
+.tarea-header .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tarea-item{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;font-size:13px}
+.tarea-item:last-child{border-bottom:none} .tarea-item:hover{background:var(--surface2)}
+.tarea-cb{width:18px;height:18px;border:2px solid var(--border);border-radius:5px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s}
+.tarea-item.done-item .tarea-cb{background:var(--accent2);border-color:var(--accent2);color:#0a0a0f}
+.tarea-item.done-item span{text-decoration:line-through;color:var(--muted)}
+
+/* METAS & HÁBITOS */
+.metas-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:32px;overflow:hidden}
+.metas-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.tab-btns{display:flex;gap:6px}
+.tab-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+.habitos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border)}
+.habito-row{background:var(--surface);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s}
+.habito-row:hover{background:var(--surface2)}
+.habito-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center}
+.habito-info{flex:1;min-width:0}
+.habito-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.habito-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.habito-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.habito-streak{font-family:'Space Mono',monospace;font-size:11px;color:var(--warn)}
+.habito-toggle{width:40px;height:22px;border-radius:11px;background:var(--surface2);border:2px solid var(--border);position:relative;transition:all .2s;flex-shrink:0}
+.habito-toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:all .2s}
+.habito-row.habito-on .habito-toggle{background:var(--accent2);border-color:var(--accent2)}
+.habito-row.habito-on .habito-toggle::after{left:20px;background:#0a0a0f}
+.habito-row.habito-on .habito-name{color:var(--accent2)}
+.semana-mini{display:flex;gap:4px;margin-top:6px}
+.sem-day{flex:1;height:5px;border-radius:3px;background:var(--surface2);transition:background .2s}
+.sem-day.done{background:var(--accent2)} .sem-day.today{outline:1px solid var(--accent)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:14px}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center}
+.stat-num{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--muted)}
+.logros-row{display:flex;gap:8px;flex-wrap:wrap;padding:16px 20px}
+.logro-badge{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);color:var(--muted);transition:all .3s}
+.logro-badge.unlocked{background:linear-gradient(135deg,#ffd166,#ff6b35);border-color:transparent;color:#0a0a0f;animation:popIn .4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* RACHA */
+.racha-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:32px}
+.racha-days{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.racha-day{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'Space Mono',monospace;border:1px solid var(--border);color:var(--muted)}
+.racha-day.active{background:linear-gradient(135deg,var(--fire),var(--warn));border-color:transparent;color:#0a0a0f;font-weight:700}
+.racha-day.hoy{border-color:var(--accent);color:var(--accent)}
+.racha-day.hoy.active{color:#0a0a0f}
+
+/* COACH */
+.coach-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:32px;overflow:hidden}
+.coach-topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.coach-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px}
+.coach-name{font-weight:600;font-size:14px}
+.online-dot{width:8px;height:8px;background:var(--accent2);border-radius:50%;margin-left:auto;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#chat-msgs{padding:16px 18px;min-height:160px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg.coach{background:var(--surface2);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--accent);align-self:flex-end;border-bottom-right-radius:4px;color:white}
+.msg.typing{color:var(--muted);font-style:italic;font-size:12px;align-self:flex-start}
+.quick-prompts{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 14px}
+.qp{background:var(--surface2);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:11px;padding:5px 11px;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.qp:hover{border-color:var(--accent);color:var(--accent)}
+.coach-input-row{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface2)}
+#chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;resize:none;min-height:42px;max-height:120px}
+#chat-input:focus{border-color:var(--accent)}
+#chat-input::placeholder{color:var(--muted)}
+#send-btn{background:var(--accent);border:none;border-radius:10px;color:white;padding:10px 18px;font-size:16px;cursor:pointer;transition:background .2s;flex-shrink:0}
+#send-btn:hover{background:#9a7afe} #send-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* GYM SECTION */
+.gym-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:32px;overflow:hidden}
+.gym-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap;gap:10px}
+.gym-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.gym-tab{background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.gym-tab.active{background:var(--fire);border-color:var(--fire);color:white}
+.gym-day-panel{padding:20px;display:none}
+.gym-day-panel.visible{display:block}
+.gym-day-title{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--fire)}
+.gym-day-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.gym-block{margin-bottom:20px}
+.gym-block-title{font-size:11px;font-family:'Space Mono',monospace;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;margin-bottom:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;display:inline-block}
+.gym-exercise{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.gym-ex-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.gym-ex-name{font-size:13px;font-weight:600;flex:1}
+.gym-ex-sets{font-family:'Space Mono',monospace;font-size:12px;color:var(--fire);flex-shrink:0;font-weight:700}
+.gym-ex-tip{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.gym-ex-alt{font-size:11px;color:var(--warn);margin-top:4px}
+.superset-tag{display:inline-block;background:rgba(124,92,252,.2);color:var(--accent);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-bottom:6px;border:1px solid rgba(124,92,252,.3)}
+.dropset-tag{display:inline-block;background:rgba(255,107,53,.2);color:var(--fire);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;border:1px solid rgba(255,107,53,.3)}
+.gym-done-btn{display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;font-size:11px;color:var(--muted);transition:color .2s;user-select:none}
+.gym-done-btn.done-ex{color:var(--accent2)}
+.gym-done-btn .chk{width:14px;height:14px;border:1px solid var(--muted);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .2s;flex-shrink:0}
+.gym-done-btn.done-ex .chk{background:var(--accent2);border-color:var(--accent2);color:#0a0a0f}
+.gym-progress-bar{height:4px;background:var(--surface2);border-radius:2px;margin-top:14px;overflow:hidden}
+.gym-progress-fill{height:100%;background:linear-gradient(90deg,var(--fire),var(--warn));border-radius:2px;transition:width .4s}
+.peso-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--accent2);font-size:11px;padding:3px 8px;width:72px;font-family:'Space Mono',monospace;margin-top:6px}
+.peso-input:focus{outline:none;border-color:var(--accent2)}
+.cardio-box{background:linear-gradient(135deg,rgba(0,229,160,.08),rgba(124,92,252,.08));border:1px solid rgba(0,229,160,.25);border-radius:10px;padding:16px;margin-bottom:8px}
+.cardio-box h4{color:var(--accent2);font-size:13px;margin-bottom:8px;font-weight:600}
+.cardio-box p{font-size:12px;color:var(--muted);line-height:1.6}
+.semana-gym{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.gym-dia-badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);color:var(--muted);cursor:default}
+.gym-dia-badge.done-day{background:rgba(255,107,53,.2);border-color:var(--fire);color:var(--fire)}
+.gym-nota{font-size:12px;color:var(--muted);line-height:1.6;padding:12px;background:var(--surface2);border-radius:8px;margin-bottom:12px;border-left:3px solid var(--accent)}
+
+footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;border-top:1px solid var(--border)}
+
+@media(max-width:500px){
+  .tareas-grid{grid-template-columns:1fr}
+  .pilares-grid{grid-template-columns:repeat(2,1fr)}
+  .habitos-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">COACH JA</div>
+  <div class="header-right">
+    <span id="fecha-hoy"></span>
+    <div class="racha-badge" onclick="document.getElementById('racha-section').scrollIntoView({behavior:'smooth'})">
+      🔥 <span id="racha-count">0</span> días
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="saludo">
+    <h1 id="saludo-txt">¡Buen día, José Aarón!</h1>
+    <p id="saludo-sub">Hoy es otro día para construir la mejor versión de ti.</p>
+  </div>
+
+  <!-- PROGRESO -->
+  <div class="progreso-wrap">
+    <div class="progreso-header">
+      <span class="section-title" style="margin:0">Progreso de hoy</span>
+      <span class="progreso-num"><span id="prog-done">0</span>/<span id="prog-total">0</span></span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+  </div>
+
+  <!-- PILARES -->
+  <p class="section-title">Tus pilares</p>
+  <div class="pilares-grid">
+    <div class="pilar gym" onclick="togglePilar(this)" data-pilar="gym">
+      <div class="pilar-check">✅</div><div class="pilar-icon">💪</div><div class="pilar-name">Gym & Músculo</div>
+    </div>
+    <div class="pilar food" onclick="togglePilar(this)" data-pilar="food">
+      <div class="pilar-check">✅</div><div class="pilar-icon">🥗</div><div class="pilar-name">Nutrición</div>
+    </div>
+    <div class="pilar ventas" onclick="togglePilar(this)" data-pilar="ventas">
+      <div class="pilar-check">✅</div><div class="pilar-icon">💼</div><div class="pilar-name">Ventas & PPR</div>
+    </div>
+    <div class="pilar content" onclick="togglePilar(this)" data-pilar="content">
+      <div class="pilar-check">✅</div><div class="pilar-icon">📱</div><div class="pilar-name">Contenido</div>
+    </div>
+  </div>
+
+  <!-- PROTOCOLO DIARIO -->
+  <p class="section-title">Protocolo diario</p>
+  <div class="tareas-grid" id="tareas-container"></div>
+
+  <!-- METAS & HÁBITOS -->
+  <p class="section-title">Metas & Hábitos</p>
+  <div class="metas-section">
+    <div class="metas-topbar">
+      <span style="font-size:13px;font-weight:600;">Hábitos diarios</span>
+      <div class="tab-btns">
+        <button class="tab-btn active" onclick="setMetaTab('hoy',this)">Hoy</button>
+        <button class="tab-btn" onclick="setMetaTab('stats',this)">Estadísticas</button>
+        <button class="tab-btn" onclick="setMetaTab('logros',this)">Logros</button>
+      </div>
+    </div>
+    <div id="meta-tab-hoy">
+      <div class="habitos-grid" id="habitos-grid"></div>
+    </div>
+    <div id="meta-tab-stats" style="display:none;padding:16px 20px">
+      <p class="section-title" style="margin-bottom:12px">Resumen general</p>
+      <div class="stats-grid" id="stats-grid"></div>
+      <p class="section-title" style="margin:20px 0 12px">Acumulado por hábito</p>
+      <div id="semana-detail"></div>
+    </div>
+    <div id="meta-tab-logros" style="display:none">
+      <div style="padding:14px 20px 6px;font-size:12px;color:var(--muted)">
+        Desbloquea medallas cumpliendo tus hábitos. Las grises aún están bloqueadas.
+      </div>
+      <div class="logros-row" id="logros-row"></div>
+    </div>
+  </div>
+
+  <!-- RACHA -->
+  <div class="racha-section" id="racha-section">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <p class="section-title" style="margin:0">Racha de consistencia</p>
+      <button onclick="marcarHoy()" style="background:var(--fire);border:none;color:#0a0a0f;font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Space Grotesk',sans-serif">✓ Marcar hoy</button>
+    </div>
+    <div class="racha-days" id="racha-days"></div>
+  </div>
+
+  <!-- RUTINAS GYM: CERO A HÉROE -->
+  <p class="section-title">Rutinas Gym — Cero a Héroe</p>
+  <div class="gym-section">
+    <div class="gym-topbar">
+      <span style="font-size:13px;font-weight:600;">🏋️ Split 4 días (Hombres)</span>
+      <div class="gym-tabs">
+        <button class="gym-tab active" onclick="setGymTab('d1',this)">Día 1 · Pecho/Tríceps</button>
+        <button class="gym-tab" onclick="setGymTab('d2',this)">Día 2 · Espalda/Bíceps</button>
+        <button class="gym-tab" onclick="setGymTab('d3',this)">Día 3 · Hombros</button>
+        <button class="gym-tab" onclick="setGymTab('d4',this)">Día 4 · Piernas</button>
+        <button class="gym-tab" onclick="setGymTab('cardio',this)">Cardio/Abs</button>
+      </div>
+    </div>
+
+    <!-- DÍA 1: PECHO / TRÍCEPS -->
+    <div id="gym-d1" class="gym-day-panel visible">
+      <div class="gym-day-title">💪 Día 1 — Pecho / Tríceps</div>
+      <div class="gym-day-sub">Calentamiento: Push-ups 3×10-20 reps antes de empezar</div>
+      <div id="gym-prog-d1" class="gym-progress-bar"><div class="gym-progress-fill" id="gym-fill-d1" style="width:0%"></div></div>
+
+      <div class="gym-block" style="margin-top:16px">
+        <div class="gym-block-title">PECHO</div>
+
+        <div class="gym-exercise" id="gex-d1-0">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">1. Press de Banca <span class="dropset-tag">DROPSET</span></div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-ex-tip">Triple dropset en la última serie. Descansa 90-120 seg entre series.</div>
+          <div class="gym-ex-alt">⚡ Menos intenso: omite el dropset. Usa Smith para mayor seguridad.</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input class="peso-input" placeholder="kg usado" oninput="savePeso('d1-0',this.value)" id="peso-d1-0">
+            <div class="gym-done-btn" id="gbtn-d1-0" onclick="toggleGymEx('d1-0')"><div class="chk"></div>Marcar como hecho</div>
+          </div>
+        </div>
+
+        <div class="gym-exercise" id="gex-d1-1">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">2A. Press inclinado con mancuernas</div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">2B. Fly inclinado con mancuernas</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-ex-tip">Sin descanso entre A y B. Descanso 60-90 seg entre supersets.</div>
+          <div class="gym-ex-alt">⚡ Menos intenso: flys en banco plano. Descansa más entre series.</div>
+          <div class="gym-done-btn" id="gbtn-d1-1" onclick="toggleGymEx('d1-1')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+
+        <div class="gym-exercise" id="gex-d1-2">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">3A. Press plano con mancuernas</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">3B. Pull-over con mancuerna</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Menos intenso: haz cada ejercicio por separado.</div>
+          <div class="gym-done-btn" id="gbtn-d1-2" onclick="toggleGymEx('d1-2')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+
+        <div class="gym-exercise" id="gex-d1-3">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">4. Cruce de cables</div>
+            <div class="gym-ex-sets">4×12/brazo</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d1-3" onclick="toggleGymEx('d1-3')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+
+      <div class="gym-block">
+        <div class="gym-block-title">TRÍCEPS</div>
+        <div class="gym-exercise" id="gex-d1-4">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">5A. Extensión tríceps mancuerna sobre cabeza</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">5B. Push-down barra EZ</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d1-4" onclick="toggleGymEx('d1-4')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d1-5">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">6A. Push-down cable 1 brazo</div>
+            <div class="gym-ex-sets">4×12/brazo</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">6B. Push-down con trenza</div>
+            <div class="gym-ex-sets">4×12</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Menos intenso: haz solo un ejercicio si estás fatigado.</div>
+          <div class="gym-done-btn" id="gbtn-d1-5" onclick="toggleGymEx('d1-5')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DÍA 2: ESPALDA / BÍCEPS -->
+    <div id="gym-d2" class="gym-day-panel">
+      <div class="gym-day-title">🔝 Día 2 — Espalda / Bíceps</div>
+      <div class="gym-day-sub">Enfoque en jalones, remos y curl variations</div>
+      <div class="gym-progress-bar"><div class="gym-progress-fill" id="gym-fill-d2" style="width:0%"></div></div>
+
+      <div class="gym-block" style="margin-top:16px">
+        <div class="gym-block-title">ESPALDA</div>
+        <div class="gym-exercise" id="gex-d2-0">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">1. Pull-ups (dominadas)</div>
+            <div class="gym-ex-sets">4×8-10</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Menos intenso: usa banda de resistencia o máquina asistida.</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input class="peso-input" placeholder="reps logradas" oninput="savePeso('d2-0',this.value)" id="peso-d2-0">
+            <div class="gym-done-btn" id="gbtn-d2-0" onclick="toggleGymEx('d2-0')"><div class="chk"></div>Marcar como hecho</div>
+          </div>
+        </div>
+        <div class="gym-exercise" id="gex-d2-1">
+          <div class="superset-tag">SUPERSET</div><span class="dropset-tag">DROPSET</span>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">2A. Jalón polea frontal</div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">2B. Remo con cable</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Omite el dropset o separa los ejercicios.</div>
+          <div class="gym-done-btn" id="gbtn-d2-1" onclick="toggleGymEx('d2-1')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d2-2">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">3A. Jalón polea invertido</div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">3B. Flexión lateral pie cable</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d2-2" onclick="toggleGymEx('d2-2')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d2-3">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">4. Remo con mancuernas</div>
+            <div class="gym-ex-sets">4×8-10</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d2-3" onclick="toggleGymEx('d2-3')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d2-4">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">5. Remo con barra</div>
+            <div class="gym-ex-sets">4×8</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Usa máquina Smith para movimiento más controlado.</div>
+          <div class="gym-done-btn" id="gbtn-d2-4" onclick="toggleGymEx('d2-4')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d2-5">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">6. Hiperextensión lumbar</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d2-5" onclick="toggleGymEx('d2-5')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+
+      <div class="gym-block">
+        <div class="gym-block-title">BÍCEPS</div>
+        <div class="gym-exercise" id="gex-d2-6">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">7A. Curl martillo de pie</div>
+            <div class="gym-ex-sets">4×12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">7B. Curl inclinado con mancuernas</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d2-6" onclick="toggleGymEx('d2-6')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d2-7">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">8A. Curl barra EZ sentado</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">8B. Curl mancuerna 1 brazo sentado</div>
+            <div class="gym-ex-sets">4×10/brazo</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d2-7" onclick="toggleGymEx('d2-7')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DÍA 3: HOMBROS / TRAPECIOS -->
+    <div id="gym-d3" class="gym-day-panel">
+      <div class="gym-day-title">🏔️ Día 3 — Hombros / Trapecios</div>
+      <div class="gym-day-sub">Los hombros anchos dan la ilusión de cintura. ¡Enfócate en la forma!</div>
+      <div class="gym-progress-bar"><div class="gym-progress-fill" id="gym-fill-d3" style="width:0%"></div></div>
+
+      <div class="gym-block" style="margin-top:16px">
+        <div class="gym-block-title">HOMBROS / TRAPECIOS</div>
+        <div class="gym-exercise" id="gex-d3-0">
+          <div class="dropset-tag" style="margin-left:0;margin-bottom:6px">DROPSET</div>
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">1. Press hombros con barra de pie</div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-ex-tip">Triple dropset en última serie. Descansa 2 min entre series.</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input class="peso-input" placeholder="kg usado" oninput="savePeso('d3-0',this.value)" id="peso-d3-0">
+            <div class="gym-done-btn" id="gbtn-d3-0" onclick="toggleGymEx('d3-0')"><div class="chk"></div>Marcar como hecho</div>
+          </div>
+        </div>
+        <div class="gym-exercise" id="gex-d3-1">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">2A. Elevaciones laterales de pie</div>
+            <div class="gym-ex-sets">4×10-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">2B. Press militar alterno 1 brazo sentado</div>
+            <div class="gym-ex-sets">4×10/brazo</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d3-1" onclick="toggleGymEx('d3-1')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d3-2">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">3. Encogimientos con barra Z (trapecios)</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d3-2" onclick="toggleGymEx('d3-2')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d3-3">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">4A. Elevaciones frontales con disco</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">4B. Elevaciones laterales inclinado 1 brazo</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d3-3" onclick="toggleGymEx('d3-3')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d3-4">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">5A. Elevaciones laterales cable 1 brazo</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">5B. Flys reversos sentado</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d3-4" onclick="toggleGymEx('d3-4')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d3-5">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">6. Encogimientos con mancuernas</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d3-5" onclick="toggleGymEx('d3-5')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DÍA 4: PIERNAS / PANTORRILLAS -->
+    <div id="gym-d4" class="gym-day-panel">
+      <div class="gym-day-title">🦵 Día 4 — Piernas / Pantorrillas</div>
+      <div class="gym-day-sub">El día más duro. No lo saltes — las piernas liberan más testosterona.</div>
+      <div class="gym-progress-bar"><div class="gym-progress-fill" id="gym-fill-d4" style="width:0%"></div></div>
+
+      <div class="gym-block" style="margin-top:16px">
+        <div class="gym-block-title">PIERNAS</div>
+        <div class="gym-exercise" id="gex-d4-0">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">1. Extensión de pierna (pre-fatiga)</div>
+            <div class="gym-ex-sets">2×8×8</div>
+          </div>
+          <div class="gym-ex-tip">8 sets de 8 reps para activar el cuádricep antes de sentadillas.</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input class="peso-input" placeholder="kg usado" oninput="savePeso('d4-0',this.value)" id="peso-d4-0">
+            <div class="gym-done-btn" id="gbtn-d4-0" onclick="toggleGymEx('d4-0')"><div class="chk"></div>Marcar como hecho</div>
+          </div>
+        </div>
+        <div class="gym-exercise" id="gex-d4-1">
+          <div class="dropset-tag" style="margin-left:0;margin-bottom:6px">DROPSET</div>
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">2. Sentadillas</div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-ex-tip">Triple dropset en la última serie. Rey de todos los ejercicios.</div>
+          <div class="gym-ex-alt">⚡ Menos intenso: omite el dropset o usa Smith.</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input class="peso-input" placeholder="kg usado" oninput="savePeso('d4-1',this.value)" id="peso-d4-1">
+            <div class="gym-done-btn" id="gbtn-d4-1" onclick="toggleGymEx('d4-1')"><div class="chk"></div>Marcar como hecho</div>
+          </div>
+        </div>
+        <div class="gym-exercise" id="gex-d4-2">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">3A. Desplantes con mancuernas</div>
+            <div class="gym-ex-sets">4×12/lado</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">3B. Curl de pierna (femoral)</div>
+            <div class="gym-ex-sets">4×12,10,8,6</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d4-2" onclick="toggleGymEx('d4-2')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d4-3">
+          <div class="superset-tag">SUPERSET</div>
+          <div class="gym-ex-top" style="margin-top:4px">
+            <div class="gym-ex-name">4A. Prensa de pierna</div>
+            <div class="gym-ex-sets">4×8-12</div>
+          </div>
+          <div class="gym-ex-top" style="margin-top:6px">
+            <div class="gym-ex-name">4B. Aductores en máquina</div>
+            <div class="gym-ex-sets">4×12-15</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d4-3" onclick="toggleGymEx('d4-3')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+
+      <div class="gym-block">
+        <div class="gym-block-title">PANTORRILLAS</div>
+        <div class="gym-exercise" id="gex-d4-4">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">5. Elevación pantorrillas sentado en máquina</div>
+            <div class="gym-ex-sets">4×30</div>
+          </div>
+          <div class="gym-ex-tip">15 reps normales + 15 reps con dedos hacia afuera. Si no hay máquina, hazlo en prensa.</div>
+          <div class="gym-done-btn" id="gbtn-d4-4" onclick="toggleGymEx('d4-4')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-d4-5">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">6. Elevación pantorrilla con mancuerna, 1 pierna</div>
+            <div class="gym-ex-sets">3×12-15</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-d4-5" onclick="toggleGymEx('d4-5')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDIO / ABS -->
+    <div id="gym-cardio" class="gym-day-panel">
+      <div class="gym-day-title">🏃 Cardio + Abdominales</div>
+      <div class="gym-day-sub">3-5 días por semana. Siempre después de pesas, nunca antes.</div>
+
+      <div class="gym-block" style="margin-top:16px">
+        <div class="cardio-box">
+          <h4>🚶 Caminata inclinada — 15-30 min</h4>
+          <p>Camina con inclinación después de las pesas. El glucógeno ya se gastó entrenando, así que el cuerpo quema grasa directamente. Efectivo y sin destruir músculo. Si quieres bajar de peso, sube a 5 días de cardio.</p>
+        </div>
+      </div>
+
+      <div class="gym-block">
+        <div class="gym-block-title">ABDOMINALES — 3-4 días/semana</div>
+        <div class="gym-nota">Circuito: 3-4 sets con 1 minuto de descanso entre sets. Ajusta según tu nivel.</div>
+        <div class="gym-exercise" id="gex-abs-0">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">1. Leg raises acostado (con o sin peso)</div>
+            <div class="gym-ex-sets">15-20 reps</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Menos intenso: sin peso.</div>
+          <div class="gym-done-btn" id="gbtn-abs-0" onclick="toggleGymEx('abs-0')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-abs-1">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">2. Russian twists con kettlebell sentado</div>
+            <div class="gym-ex-sets">15 reps/lado</div>
+          </div>
+          <div class="gym-ex-alt">⚡ Menos intenso: sin peso.</div>
+          <div class="gym-done-btn" id="gbtn-abs-1" onclick="toggleGymEx('abs-1')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-abs-2">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">3. V-ups</div>
+            <div class="gym-ex-sets">15 reps</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-abs-2" onclick="toggleGymEx('abs-2')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+        <div class="gym-exercise" id="gex-abs-3">
+          <div class="gym-ex-top">
+            <div class="gym-ex-name">4. Side bridges (plancha lateral)</div>
+            <div class="gym-ex-sets">15-20/lado</div>
+          </div>
+          <div class="gym-done-btn" id="gbtn-abs-3" onclick="toggleGymEx('abs-3')"><div class="chk"></div>Marcar como hecho</div>
+        </div>
+      </div>
+
+      <div class="gym-block">
+        <div class="gym-block-title">PROGRESIÓN DE PESOS (semanas)</div>
+        <div class="gym-nota">Sem 1-2: aprende la forma correcta. Sem 3-4: sube 5-10%. Sem 5-6: sube otro 5-10%. Sem 7-8: sube otro 5-10%. Meta: aumentar 20-50% tu peso inicial en 2 meses.</div>
+        <div class="cardio-box">
+          <h4>📋 Regla para subir de peso</h4>
+          <p>Cuando puedas completar TODAS las repeticiones con buena técnica y sin dolor, es momento de subir. Sube máximo 2.5kg a la vez en ejercicios de aislamiento y 5kg en compuestos. La forma siempre gana sobre el peso.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COACH IA -->
+  <p class="section-title">Tu coach personal (IA)</p>
+  <div class="coach-panel">
+    <div class="coach-topbar">
+      <div class="coach-avatar">🤖</div>
+      <div><div class="coach-name">Coach IA</div><div style="font-size:11px;color:var(--muted)">Siempre disponible</div></div>
+      <div class="online-dot"></div>
+    </div>
+    <div id="chat-msgs"></div>
+    <div class="quick-prompts">
+      <div class="qp" onclick="sendQuick(this)">Cómo supero la procrastinación hoy</div>
+      <div class="qp" onclick="sendQuick(this)">Dame rutina de gym para hoy</div>
+      <div class="qp" onclick="sendQuick(this)">Script de prospección PPR</div>
+      <div class="qp" onclick="sendQuick(this)">Qué comer si quiero ganar músculo</div>
+      <div class="qp" onclick="sendQuick(this)">Idea de video para TikTok/Instagram</div>
+      <div class="qp" onclick="sendQuick(this)">Estoy sin energía, motívame</div>
+    </div>
+    <div class="coach-input-row">
+      <textarea id="chat-input" placeholder="Pregúntale algo a tu coach..." rows="1"></textarea>
+      <button id="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+</div>
+<footer>COACH JA · Campeche, México · Construido para crecer 🚀</footer>
+
+<script>
+// ── ESTADO ──────────────────────────────────────────────
+const DATA_KEY = 'coach_ja_v5';
+function getState() { try { return JSON.parse(localStorage.getItem(DATA_KEY)) || {}; } catch { return {}; } }
+function saveState(s) { try { localStorage.setItem(DATA_KEY, JSON.stringify(s)); } catch(e) {} }
+
+let state = getState();
+if (!state.tareas)        state.tareas = {};
+if (!state.pilares)       state.pilares = {};
+if (!state.racha)         state.racha = [];
+if (!state.habitoHist)    state.habitoHist = {};
+if (!state.lastReset)     state.lastReset = hoyKey();
+
+// ── UTILIDADES ──────────────────────────────────────────
+function hoyKey() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function setFecha() {
+  const d = new Date();
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('fecha-hoy').textContent = dias[d.getDay()]+', '+d.getDate()+' '+meses[d.getMonth()]+' '+d.getFullYear();
+}
+function setSaludo() {
+  const h = new Date().getHours();
+  const greet = h < 12 ? '¡Buen día' : h < 19 ? '¡Buenas tardes' : '¡Buenas noches';
+  const subs = ['Hoy es otro día para construir la mejor versión de ti.','Un día sin avanzar es un día desperdiciado. Vamos.','GPenta y PPR te esperan. Bella también. 🐾','Fuerza, disciplina, consistencia. Eso eres tú.'];
+  document.getElementById('saludo-txt').textContent = greet+', José Aarón!';
+  document.getElementById('saludo-sub').textContent = subs[Math.floor(Math.random()*subs.length)];
+}
+
+// ── RESET DIARIO ─────────────────────────────────────────
+function checkReset() {
+  const hoy = hoyKey();
+  if (state.lastReset !== hoy) {
+    state.tareas = {};
+    state.pilares = {};
+    state.lastReset = hoy;
+    saveState(state);
+  }
+}
+
+// ── PROTOCOLO DIARIO ─────────────────────────────────────
+const PROTOCOLO = [
+  { cat:'🌅 Mañana (6–8am)', color:'#ff6b35',
+    items:['Levantarte sin snooze','Agua + limón en ayunas (500ml)','Revisar agenda del día (5 min)','Ejercicio / ir al gym'] },
+  { cat:'💼 Trabajo (9am–1pm)', color:'#7c5cfc',
+    items:['Tarea #1 GPenta (cotización, factura o proyecto)','Prospectar 3 contactos PPR','Responder WhatsApps pendientes','Al menos 1 cita agendada PPR'] },
+  { cat:'🥗 Nutrición', color:'#00e5a0',
+    items:['Desayuno con proteína (huevo, pollo, etc.)','Comida balanceada con verduras','Snack saludable (fruta, nueces)','2.5L de agua durante el día'] },
+  { cat:'📱 Contenido & Tarde', color:'#ffd166',
+    items:['Grabar o planear 1 video (TikTok/IG)','Publicar o programar contenido','Revisar métricas de redes sociales','Cerrar pendientes GPenta del día'] },
+  { cat:'🌙 Noche (9–11pm)', color:'#6b8afd',
+    items:['Cenar ligero (no chatarra)','Revisar lo que lograste hoy','Preparar agenda de mañana','Sin celular 30 min antes de dormir'] },
+];
+
+function renderTareas() {
+  const cont = document.getElementById('tareas-container');
+  cont.innerHTML = '';
+  let total = 0, done = 0;
+  PROTOCOLO.forEach((cat, ci) => {
+    const card = document.createElement('div');
+    card.className = 'tarea-card';
+    const hdr = document.createElement('div');
+    hdr.className = 'tarea-header';
+    hdr.innerHTML = '<div class="dot" style="background:'+cat.color+'"></div>'+cat.cat;
+    card.appendChild(hdr);
+    cat.items.forEach((item, ii) => {
+      const key = ci+'_'+ii;
+      const isDone = !!state.tareas[key];
+      total++; if (isDone) done++;
+      const row = document.createElement('div');
+      row.className = 'tarea-item'+(isDone?' done-item':'');
+      row.innerHTML = '<div class="tarea-cb">'+(isDone?'✓':'')+'</div><span>'+item+'</span>';
+      row.onclick = () => { state.tareas[key]=!state.tareas[key]; saveState(state); renderTareas(); };
+      card.appendChild(row);
+    });
+    cont.appendChild(card);
+  });
+  document.getElementById('prog-done').textContent = done;
+  document.getElementById('prog-total').textContent = total;
+  document.getElementById('bar-fill').style.width = (total ? Math.round(done/total*100) : 0)+'%';
+}
+
+// ── PILARES ──────────────────────────────────────────────
+function togglePilar(el) {
+  const p = el.dataset.pilar;
+  state.pilares[p] = !state.pilares[p];
+  saveState(state);
+  renderPilares();
+}
+function renderPilares() {
+  document.querySelectorAll('.pilar').forEach(el => {
+    el.classList.toggle('done', !!state.pilares[el.dataset.pilar]);
+  });
+}
+
+// ── HÁBITOS & METAS ──────────────────────────────────────
+const HABITOS = [
+  { id:'despertar', icon:'⏰', name:'Levantarme temprano',      sub:'Antes de las 7am, sin snooze' },
+  { id:'ducha',     icon:'🚿', name:'Ducha / baño',              sub:'Activa el cuerpo y la mente' },
+  { id:'gym',       icon:'🏋️', name:'Gym / ejercicio',           sub:'Mínimo 45 min de movimiento' },
+  { id:'proteina',  icon:'🥩', name:'Proteína en cada comida',  sub:'Pollo, huevo, carne, atún…' },
+  { id:'agua',      icon:'💧', name:'Tomar 2.5L de agua',       sub:'Hidratación = energía y salud' },
+  { id:'leer',      icon:'📚', name:'Leer 20 min',              sub:'Libros de ventas, negocios, mente' },
+  { id:'practicar', icon:'🎯', name:'Practicar una habilidad',  sub:'Ventas, presentaciones, contenido' },
+  { id:'prospectar',icon:'📞', name:'Prospectar PPR (3+)',       sub:'Mínimo 3 contactos al día' },
+  { id:'contenido', icon:'🎬', name:'Crear contenido',          sub:'TikTok, Instagram o idea nueva' },
+  { id:'nocelular', icon:'📵', name:'Sin celular antes de dormir',sub:'30 min sin pantallas' },
+  { id:'reflexion', icon:'📝', name:'Reflexión nocturna',        sub:'¿Qué logré hoy? ¿Qué mejorar?' },
+  { id:'gratitud',  icon:'🙏', name:'Agradecer 3 cosas',         sub:'Mindset positivo y enfocado' },
+];
+
+const LOGROS = [
+  { id:'primero',  icon:'🌱', label:'Primer día',       cond:s=>s.totalDays>=1 },
+  { id:'semana',   icon:'🔥', label:'Semana completa',  cond:s=>s.streak>=7 },
+  { id:'quincena', icon:'💪', label:'15 días seguidos', cond:s=>s.streak>=15 },
+  { id:'mes',      icon:'🏆', label:'Un mes de racha',  cond:s=>s.streak>=30 },
+  { id:'gym7',     icon:'🏋️', label:'Gym 7 veces',      cond:s=>(s.perH['gym']||0)>=7 },
+  { id:'gym30',    icon:'🦾', label:'Gym 30 veces',     cond:s=>(s.perH['gym']||0)>=30 },
+  { id:'leer7',    icon:'📖', label:'Leer 7 días',      cond:s=>(s.perH['leer']||0)>=7 },
+  { id:'prosp10',  icon:'💼', label:'10 días prospectando', cond:s=>(s.perH['prospectar']||0)>=10 },
+  { id:'cont7',    icon:'🎬', label:'Contenido 7 días', cond:s=>(s.perH['contenido']||0)>=7 },
+  { id:'agua7',    icon:'💧', label:'Agua 7 días',      cond:s=>(s.perH['agua']||0)>=7 },
+  { id:'perfecto', icon:'⭐', label:'Día perfecto',     cond:s=>s.perfectDays>=1 },
+  { id:'perf5',    icon:'🌟', label:'5 días perfectos', cond:s=>s.perfectDays>=5 },
+];
+
+function getHabitosHoy() {
+  const k = hoyKey();
+  if (!state.habitoHist[k]) state.habitoHist[k] = {};
+  return state.habitoHist[k];
+}
+
+function getHabitoStreak(id) {
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 90; i++) {
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if (state.habitoHist[k] && state.habitoHist[k][id]) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function calcStats() {
+  const keys = Object.keys(state.habitoHist);
+  const totalDays = keys.filter(k=>Object.values(state.habitoHist[k]).some(Boolean)).length;
+  const perH = {};
+  HABITOS.forEach(h => { perH[h.id] = keys.filter(k=>state.habitoHist[k][h.id]).length; });
+  const perfectDays = keys.filter(k=>HABITOS.every(h=>state.habitoHist[k][h.id])).length;
+  let streak = 0;
+  const d = new Date();
+  for (let i = 0; i < 90; i++) {
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if (state.habitoHist[k] && Object.values(state.habitoHist[k]).some(Boolean)) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return { totalDays, perH, perfectDays, streak };
+}
+
+function toggleHabito(id) {
+  const hoy = getHabitosHoy();
+  hoy[id] = !hoy[id];
+  saveState(state);
+  renderHabitos();
+  renderLogros();
+  if (hoy[id]) {
+    const hab = HABITOS.find(h=>h.id===id);
+    const msgs = ['✅ ¡'+hab.name+' completado! Eso es disciplina real.','🔥 ¡Listo! Cada hábito que completas te acerca más a quien quieres ser.','💪 ¡Crack! '+hab.name+' — tachado. Sigue así.'];
+    addMsg('coach', msgs[Math.floor(Math.random()*msgs.length)]);
+  }
+}
+
+function renderHabitos() {
+  const grid = document.getElementById('habitos-grid');
+  const hoy = getHabitosHoy();
+  grid.innerHTML = '';
+  HABITOS.forEach(h => {
+    const on = !!hoy[h.id];
+    const streak = getHabitoStreak(h.id);
+    const semDays = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      semDays.push({ done:!!(state.habitoHist[k]&&state.habitoHist[k][h.id]), today:i===0 });
+    }
+    const semHTML = semDays.map(s=>'<div class="sem-day'+(s.done?' done':'')+(s.today?' today':'')+'"></div>').join('');
+    const row = document.createElement('div');
+    row.className = 'habito-row'+(on?' habito-on':'');
+    row.innerHTML =
+      '<div class="habito-icon">'+h.icon+'</div>'+
+      '<div class="habito-info">'+
+        '<div class="habito-name">'+h.name+'</div>'+
+        '<div class="habito-sub">'+h.sub+'</div>'+
+        '<div class="semana-mini">'+semHTML+'</div>'+
+      '</div>'+
+      '<div class="habito-right">'+
+        (streak>0?'<div class="habito-streak">🔥'+streak+'</div>':'')+
+        '<div class="habito-toggle"></div>'+
+      '</div>';
+    row.onclick = ()=>toggleHabito(h.id);
+    grid.appendChild(row);
+  });
+}
+
+function renderStats() {
+  const s = calcStats();
+  const hoy = getHabitosHoy();
+  const doneHoy = HABITOS.filter(h=>hoy[h.id]).length;
+  const pctHoy = Math.round(doneHoy/HABITOS.length*100);
+  const totalH = Object.values(s.perH).reduce((a,b)=>a+b,0);
+  document.getElementById('stats-grid').innerHTML =
+    statCard(doneHoy+'/'+HABITOS.length,'var(--accent2)','Hábitos hoy')+
+    statCard(s.streak,'var(--fire)','Racha de días')+
+    statCard(s.totalDays,'var(--accent)','Días activos')+
+    statCard(s.perfectDays,'var(--warn)','Días perfectos')+
+    statCard(totalH,'var(--accent2)','Hábitos totales')+
+    statCard(pctHoy+'%','var(--accent)','Efectividad hoy');
+  const det = document.getElementById('semana-detail');
+  det.innerHTML = '';
+  HABITOS.forEach(h=>{
+    const count = s.perH[h.id]||0;
+    const streak = getHabitoStreak(h.id);
+    const pct = s.totalDays>0?Math.round(count/Math.max(s.totalDays,1)*100):0;
+    const row = document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)';
+    row.innerHTML =
+      '<span style="font-size:18px;width:28px;text-align:center">'+h.icon+'</span>'+
+      '<div style="flex:1"><div style="font-size:12px;font-weight:600;margin-bottom:4px">'+h.name+'</div>'+
+      '<div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden">'+
+      '<div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s"></div></div></div>'+
+      '<div style="text-align:right;flex-shrink:0"><div style="font-family:\'Space Mono\',monospace;font-size:13px;font-weight:700;color:var(--accent2)">'+count+'x</div>'+
+      (streak>0?'<div style="font-size:10px;color:var(--warn)">🔥'+streak+' días</div>':'<div style="font-size:10px;color:var(--muted)">sin racha</div>')+'</div>';
+    det.appendChild(row);
+  });
+}
+function statCard(num,color,label){
+  return '<div class="stat-card"><div class="stat-num" style="color:'+color+'">'+num+'</div><div class="stat-label">'+label+'</div></div>';
+}
+
+function renderLogros() {
+  const s = calcStats();
+  const row = document.getElementById('logros-row');
+  row.innerHTML = '';
+  LOGROS.forEach(l=>{
+    const ok = l.cond(s);
+    const b = document.createElement('div');
+    b.className='logro-badge'+(ok?' unlocked':'');
+    b.innerHTML=l.icon+' '+l.label;
+    b.title=ok?'¡Desbloqueado!':'Bloqueado';
+    row.appendChild(b);
+  });
+}
+
+let currentTab = 'hoy';
+function setMetaTab(tab, btn) {
+  currentTab = tab;
+  ['hoy','stats','logros'].forEach(t=>{
+    document.getElementById('meta-tab-'+t).style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (tab==='stats') renderStats();
+  if (tab==='logros') renderLogros();
+}
+
+// ── RACHA ────────────────────────────────────────────────
+function marcarHoy() {
+  const hoy = hoyKey();
+  if (!state.racha.includes(hoy)) {
+    state.racha.push(hoy);
+    saveState(state);
+    renderRacha();
+    addMsg('coach','🔥 ¡Día marcado! La consistencia es lo que separa a los exitosos de los que solo sueñan. ¡Qué crack!');
+  } else {
+    addMsg('coach','Ya marcaste hoy. ¡Sigue adelante!');
+  }
+}
+function renderRacha() {
+  const cont = document.getElementById('racha-days');
+  const hoy = hoyKey();
+  cont.innerHTML = '';
+  for (let i = 20; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const el = document.createElement('div');
+    el.className = 'racha-day';
+    if (state.racha.includes(k)) el.classList.add('active');
+    if (k===hoy) el.classList.add('hoy');
+    el.textContent = d.getDate();
+    cont.appendChild(el);
+  }
+  let streak=0, chk=new Date();
+  for (let i=0;i<60;i++){
+    const k=chk.getFullYear()+'-'+String(chk.getMonth()+1).padStart(2,'0')+'-'+String(chk.getDate()).padStart(2,'0');
+    if(state.racha.includes(k)){streak++;chk.setDate(chk.getDate()-1);}else break;
+  }
+  document.getElementById('racha-count').textContent = streak;
+}
+
+// ── COACH IA ─────────────────────────────────────────────
+const SYSTEM = `Eres el coach personal de José Aarón, joven emprendedor de Campeche, México. Tiene dos negocios: GPenta (tecnología y artículos de oficina con su papá Francisco) y es asesor de PPR con Allianz bajo el despacho HQ con su mentor Salvador. Quiere ganar músculo, comer saludable, dejar de procrastinar y crear contenido para TikTok e Instagram. Tiene una perra llamada Bella.
+
+Sé su coach de vida y negocios. Responde en español, directo, motivador, práctico. Sin frases genéricas. Da consejos específicos y accionables. Para ventas PPR usa técnicas de cierre reales. Para gym da rutinas concretas. Máximo 200 palabras. Emojis con moderación.`;
+
+const chatHistory = [];
+
+async function callClaude(userMsg) {
+  chatHistory.push({role:'user',content:userMsg});
+  const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:chatHistory})
+  });
+  const data = await resp.json();
+  const text = data.content?.map(b=>b.text||'').join('')||'Error al conectar.';
+  chatHistory.push({role:'assistant',content:text});
+  return text;
+}
+
+function addMsg(role,text){
+  const cont=document.getElementById('chat-msgs');
+  const el=document.createElement('div');
+  el.className='msg '+role;
+  el.textContent=text;
+  cont.appendChild(el);
+  cont.scrollTop=cont.scrollHeight;
+}
+function removeTyping(){const t=document.querySelector('.msg.typing');if(t)t.remove();}
+
+async function sendMsg(){
+  const input=document.getElementById('chat-input');
+  const btn=document.getElementById('send-btn');
+  const text=input.value.trim();
+  if(!text)return;
+  addMsg('user',text);
+  input.value='';
+  input.style.height='auto';
+  btn.disabled=true;
+  addMsg('typing','Coach está escribiendo...');
+  try{
+    const reply=await callClaude(text);
+    removeTyping();
+    addMsg('coach',reply);
+  }catch(e){
+    removeTyping();
+    addMsg('coach','⚠️ Sin conexión. Revisa tu internet e intenta de nuevo.');
+  }
+  btn.disabled=false;
+  input.focus();
+}
+function sendQuick(el){document.getElementById('chat-input').value=el.textContent;sendMsg();}
+
+document.getElementById('chat-input').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+document.getElementById('chat-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+
+// ── GYM CERO A HÉROE ─────────────────────────────────────
+if (!state.gymDone)  state.gymDone  = {};
+if (!state.gymPesos) state.gymPesos = {};
+
+const GYM_COUNTS = { d1:6, d2:8, d3:6, d4:6, abs:4 };
+
+function setGymTab(tab, btn) {
+  ['d1','d2','d3','d4','cardio'].forEach(t => {
+    const p = document.getElementById('gym-'+t);
+    if (p) p.classList.toggle('visible', t===tab);
+  });
+  document.querySelectorAll('.gym-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleGymEx(key) {
+  state.gymDone[key] = !state.gymDone[key];
+  saveState(state);
+  renderGymDone();
+  if (state.gymDone[key]) {
+    const names = {
+      'd1-0':'Press de Banca','d1-1':'Superset Inclinado','d1-2':'Superset Plano','d1-3':'Cruce de Cables','d1-4':'Superset Tríceps','d1-5':'Push-down Trenza',
+      'd2-0':'Pull-ups','d2-1':'Jalón + Remo','d2-2':'Jalón Invertido','d2-3':'Remo Mancuerna','d2-4':'Remo Barra','d2-5':'Hiperextensión','d2-6':'Curl Martillo','d2-7':'Curl EZ',
+      'd3-0':'Press Hombros','d3-1':'Elevaciones Laterales','d3-2':'Encogimientos Z','d3-3':'Frontales+Laterales','d3-4':'Cable+Flys','d3-5':'Encogimientos Mancuerna',
+      'd4-0':'Extensión Pierna','d4-1':'Sentadillas','d4-2':'Desplantes+Femoral','d4-3':'Prensa+Aductores','d4-4':'Pantorrillas Máquina','d4-5':'Pantorrilla 1 pierna',
+      'abs-0':'Leg Raises','abs-1':'Russian Twists','abs-2':'V-ups','abs-3':'Side Bridges'
+    };
+    const n = names[key] || 'ejercicio';
+    const msgs = ['💪 ¡'+n+' listo! Sigue así, Champ.','🔥 '+n+' — tachado. Qué crack.','✅ ¡'+n+' completado! Cada rep te acerca a tu meta.'];
+    addMsg('coach', msgs[Math.floor(Math.random()*msgs.length)]);
+  }
+}
+
+function savePeso(key, val) {
+  state.gymPesos[key] = val;
+  saveState(state);
+}
+
+function renderGymDone() {
+  ['d1','d2','d3','d4','abs'].forEach(day => {
+    const count = GYM_COUNTS[day] || 0;
+    let done = 0;
+    for (let i = 0; i < count; i++) {
+      const key = day+'-'+i;
+      const btn = document.getElementById('gbtn-'+key);
+      const isDone = !!state.gymDone[key];
+      if (isDone) done++;
+      if (btn) {
+        btn.classList.toggle('done-ex', isDone);
+        const chk = btn.querySelector('.chk');
+        if (chk) chk.textContent = isDone ? '✓' : '';
+      }
+    }
+    const fill = document.getElementById('gym-fill-'+day);
+    if (fill) fill.style.width = (count ? Math.round(done/count*100) : 0)+'%';
+  });
+  Object.entries(state.gymPesos).forEach(([key, val]) => {
+    const inp = document.getElementById('peso-'+key);
+    if (inp && val) inp.value = val;
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────
+function init(){
+  checkReset();
+  setFecha();
+  setSaludo();
+  renderTareas();
+  renderPilares();
+  renderHabitos();
+  renderLogros();
+  renderRacha();
+  renderGymDone();
+  const msgs=[
+    '¡Hola José Aarón! 💪 ¿Qué reto enfrentas hoy? Puedo darte un plan de acción, script de ventas PPR, rutina de gym, o un empujón cuando lo necesites.',
+    '¡Qué onda! 🚀 Tu racha, tus ventas y tus músculos se construyen HOY, no mañana. Dime en qué necesitas apoyo.',
+    '¡Buen día! Recuerda: cada prospecto que no llamas hoy, otro asesor lo cierra mañana. ¿Listo para atacar?'
+  ];
+  addMsg('coach',msgs[Math.floor(Math.random()*msgs.length)]);
+}
+init();
+</script>
+</body>
+</html>
