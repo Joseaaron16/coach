@@ -663,28 +663,6 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-fam
     </div>
   </div>
 
-  <!-- COACH IA -->
-  <p class="section-title">Tu coach personal (IA)</p>
-  <div class="coach-panel">
-    <div class="coach-topbar">
-      <div class="coach-avatar">🤖</div>
-      <div><div class="coach-name">Coach IA</div><div style="font-size:11px;color:var(--muted)">Siempre disponible</div></div>
-      <div class="online-dot"></div>
-    </div>
-    <div id="chat-msgs"></div>
-    <div class="quick-prompts">
-      <div class="qp" onclick="sendQuick(this)">Cómo supero la procrastinación hoy</div>
-      <div class="qp" onclick="sendQuick(this)">Dame rutina de gym para hoy</div>
-      <div class="qp" onclick="sendQuick(this)">Script de prospección PPR</div>
-      <div class="qp" onclick="sendQuick(this)">Qué comer si quiero ganar músculo</div>
-      <div class="qp" onclick="sendQuick(this)">Idea de video para TikTok/Instagram</div>
-      <div class="qp" onclick="sendQuick(this)">Estoy sin energía, motívame</div>
-    </div>
-    <div class="coach-input-row">
-      <textarea id="chat-input" placeholder="Pregúntale algo a tu coach..." rows="1"></textarea>
-      <button id="send-btn" onclick="sendMsg()">➤</button>
-    </div>
-  </div>
 
 </div>
 <footer>COACH JA · Campeche, México · Construido para crecer 🚀</footer>
@@ -991,62 +969,6 @@ function renderRacha() {
   document.getElementById('racha-count').textContent = streak;
 }
 
-// ── COACH IA ─────────────────────────────────────────────
-const SYSTEM = `Eres el coach personal de José Aarón, joven emprendedor de Campeche, México. Tiene dos negocios: GPenta (tecnología y artículos de oficina con su papá Francisco) y es asesor de PPR con Allianz bajo el despacho HQ con su mentor Salvador. Quiere ganar músculo, comer saludable, dejar de procrastinar y crear contenido para TikTok e Instagram. Tiene una perra llamada Bella.
-
-Sé su coach de vida y negocios. Responde en español, directo, motivador, práctico. Sin frases genéricas. Da consejos específicos y accionables. Para ventas PPR usa técnicas de cierre reales. Para gym da rutinas concretas. Máximo 200 palabras. Emojis con moderación.`;
-
-const chatHistory = [];
-
-async function callClaude(userMsg) {
-  chatHistory.push({role:'user',content:userMsg});
-  const resp = await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:chatHistory})
-  });
-  const data = await resp.json();
-  const text = data.content?.map(b=>b.text||'').join('')||'Error al conectar.';
-  chatHistory.push({role:'assistant',content:text});
-  return text;
-}
-
-function addMsg(role,text){
-  const cont=document.getElementById('chat-msgs');
-  const el=document.createElement('div');
-  el.className='msg '+role;
-  el.textContent=text;
-  cont.appendChild(el);
-  cont.scrollTop=cont.scrollHeight;
-}
-function removeTyping(){const t=document.querySelector('.msg.typing');if(t)t.remove();}
-
-async function sendMsg(){
-  const input=document.getElementById('chat-input');
-  const btn=document.getElementById('send-btn');
-  const text=input.value.trim();
-  if(!text)return;
-  addMsg('user',text);
-  input.value='';
-  input.style.height='auto';
-  btn.disabled=true;
-  addMsg('typing','Coach está escribiendo...');
-  try{
-    const reply=await callClaude(text);
-    removeTyping();
-    addMsg('coach',reply);
-  }catch(e){
-    removeTyping();
-    addMsg('coach','⚠️ Sin conexión. Revisa tu internet e intenta de nuevo.');
-  }
-  btn.disabled=false;
-  input.focus();
-}
-function sendQuick(el){document.getElementById('chat-input').value=el.textContent;sendMsg();}
-
-document.getElementById('chat-input').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
-document.getElementById('chat-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
-
 // ── GYM CERO A HÉROE ─────────────────────────────────────
 if (!state.gymDone)  state.gymDone  = {};
 if (!state.gymPesos) state.gymPesos = {};
@@ -1066,18 +988,6 @@ function toggleGymEx(key) {
   state.gymDone[key] = !state.gymDone[key];
   saveState(state);
   renderGymDone();
-  if (state.gymDone[key]) {
-    const names = {
-      'd1-0':'Press de Banca','d1-1':'Superset Inclinado','d1-2':'Superset Plano','d1-3':'Cruce de Cables','d1-4':'Superset Tríceps','d1-5':'Push-down Trenza',
-      'd2-0':'Pull-ups','d2-1':'Jalón + Remo','d2-2':'Jalón Invertido','d2-3':'Remo Mancuerna','d2-4':'Remo Barra','d2-5':'Hiperextensión','d2-6':'Curl Martillo','d2-7':'Curl EZ',
-      'd3-0':'Press Hombros','d3-1':'Elevaciones Laterales','d3-2':'Encogimientos Z','d3-3':'Frontales+Laterales','d3-4':'Cable+Flys','d3-5':'Encogimientos Mancuerna',
-      'd4-0':'Extensión Pierna','d4-1':'Sentadillas','d4-2':'Desplantes+Femoral','d4-3':'Prensa+Aductores','d4-4':'Pantorrillas Máquina','d4-5':'Pantorrilla 1 pierna',
-      'abs-0':'Leg Raises','abs-1':'Russian Twists','abs-2':'V-ups','abs-3':'Side Bridges'
-    };
-    const n = names[key] || 'ejercicio';
-    const msgs = ['💪 ¡'+n+' listo! Sigue así, Champ.','🔥 '+n+' — tachado. Qué crack.','✅ ¡'+n+' completado! Cada rep te acerca a tu meta.'];
-    addMsg('coach', msgs[Math.floor(Math.random()*msgs.length)]);
-  }
 }
 
 function savePeso(key, val) {
@@ -1120,12 +1030,6 @@ function init(){
   renderLogros();
   renderRacha();
   renderGymDone();
-  const msgs=[
-    '¡Hola José Aarón! 💪 ¿Qué reto enfrentas hoy? Puedo darte un plan de acción, script de ventas PPR, rutina de gym, o un empujón cuando lo necesites.',
-    '¡Qué onda! 🚀 Tu racha, tus ventas y tus músculos se construyen HOY, no mañana. Dime en qué necesitas apoyo.',
-    '¡Buen día! Recuerda: cada prospecto que no llamas hoy, otro asesor lo cierra mañana. ¿Listo para atacar?'
-  ];
-  addMsg('coach',msgs[Math.floor(Math.random()*msgs.length)]);
 }
 init();
 </script>
