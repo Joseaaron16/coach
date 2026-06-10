@@ -158,6 +158,15 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .gym-dia-badge.done-day{background:rgba(255,107,53,.2);border-color:var(--fire);color:var(--fire)}
 .gym-nota{font-size:12px;color:var(--muted);line-height:1.6;padding:12px;background:var(--surface2);border-radius:8px;margin-bottom:12px;border-left:3px solid var(--accent)}
 
+/* HISTORIAL NAV */
+.historial-nav{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fecha-nav-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.fecha-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.fecha-activa-label{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent2);font-weight:700;flex:1;text-align:center}
+.hoy-btn{background:var(--accent);border:none;border-radius:8px;color:white;font-size:11px;font-weight:700;padding:6px 12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.hoy-btn:hover{background:#9a7afe}
+.editando-badge{background:rgba(255,209,102,.15);border:1px solid var(--warn);color:var(--warn);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+
 footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;border-top:1px solid var(--border)}
 
 @media(max-width:500px){
@@ -184,6 +193,15 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-fam
   <div class="saludo">
     <h1 id="saludo-txt">¡Buen día, José Aarón!</h1>
     <p id="saludo-sub">Hoy es otro día para construir la mejor versión de ti.</p>
+  </div>
+
+  <!-- NAVEGACIÓN DE FECHA -->
+  <div class="historial-nav">
+    <button class="fecha-nav-btn" onclick="navegarFecha(-1)">◀</button>
+    <div class="fecha-activa-label" id="fecha-activa-label"></div>
+    <span class="editando-badge" id="editando-badge" style="display:none">✏️ Editando día anterior</span>
+    <button class="hoy-btn" id="hoy-btn" onclick="irAHoy()" style="display:none">Ir a hoy</button>
+    <button class="fecha-nav-btn" onclick="navegarFecha(1)">▶</button>
   </div>
 
   <!-- PROGRESO -->
@@ -669,16 +687,40 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-fam
 
 <script>
 // ── ESTADO ──────────────────────────────────────────────
-const DATA_KEY = 'coach_ja_v5';
+const DATA_KEY = 'coach_ja_v6';
 function getState() { try { return JSON.parse(localStorage.getItem(DATA_KEY)) || {}; } catch { return {}; } }
 function saveState(s) { try { localStorage.setItem(DATA_KEY, JSON.stringify(s)); } catch(e) {} }
 
 let state = getState();
-if (!state.tareas)        state.tareas = {};
-if (!state.pilares)       state.pilares = {};
+if (!state.historial)     state.historial = {};   // { 'YYYY-MM-DD': { tareas:{}, pilares:{}, gymDone:{}, gymPesos:{} } }
 if (!state.racha)         state.racha = [];
 if (!state.habitoHist)    state.habitoHist = {};
 if (!state.lastReset)     state.lastReset = hoyKey();
+
+// Migrar datos viejos si existen
+if (state.tareas || state.pilares || state.gymDone) {
+  const k = state.lastReset || hoyKey();
+  if (!state.historial[k]) state.historial[k] = {};
+  if (state.tareas)   state.historial[k].tareas   = state.tareas;
+  if (state.pilares)  state.historial[k].pilares  = state.pilares;
+  if (state.gymDone)  state.historial[k].gymDone  = state.gymDone;
+  if (state.gymPesos) state.historial[k].gymPesos = state.gymPesos;
+  delete state.tareas; delete state.pilares; delete state.gymDone; delete state.gymPesos;
+  saveState(state);
+}
+
+// Fecha activa (hoy por defecto, puede cambiar al navegar historial)
+let fechaActiva = hoyKey();
+
+function getDayData(fecha) {
+  if (!state.historial[fecha]) state.historial[fecha] = { tareas:{}, pilares:{}, gymDone:{}, gymPesos:{} };
+  const d = state.historial[fecha];
+  if (!d.tareas)   d.tareas   = {};
+  if (!d.pilares)  d.pilares  = {};
+  if (!d.gymDone)  d.gymDone  = {};
+  if (!d.gymPesos) d.gymPesos = {};
+  return d;
+}
 
 // ── UTILIDADES ──────────────────────────────────────────
 function hoyKey() {
@@ -702,12 +744,9 @@ function setSaludo() {
 // ── RESET DIARIO ─────────────────────────────────────────
 function checkReset() {
   const hoy = hoyKey();
-  if (state.lastReset !== hoy) {
-    state.tareas = {};
-    state.pilares = {};
-    state.lastReset = hoy;
-    saveState(state);
-  }
+  state.lastReset = hoy;
+  getDayData(hoy); // ensure today's entry exists
+  saveState(state);
 }
 
 // ── PROTOCOLO DIARIO ─────────────────────────────────────
@@ -728,6 +767,7 @@ function renderTareas() {
   const cont = document.getElementById('tareas-container');
   cont.innerHTML = '';
   let total = 0, done = 0;
+  const dayData = getDayData(fechaActiva);
   PROTOCOLO.forEach((cat, ci) => {
     const card = document.createElement('div');
     card.className = 'tarea-card';
@@ -737,12 +777,12 @@ function renderTareas() {
     card.appendChild(hdr);
     cat.items.forEach((item, ii) => {
       const key = ci+'_'+ii;
-      const isDone = !!state.tareas[key];
+      const isDone = !!dayData.tareas[key];
       total++; if (isDone) done++;
       const row = document.createElement('div');
       row.className = 'tarea-item'+(isDone?' done-item':'');
       row.innerHTML = '<div class="tarea-cb">'+(isDone?'✓':'')+'</div><span>'+item+'</span>';
-      row.onclick = () => { state.tareas[key]=!state.tareas[key]; saveState(state); renderTareas(); };
+      row.onclick = () => { dayData.tareas[key]=!dayData.tareas[key]; saveState(state); renderTareas(); };
       card.appendChild(row);
     });
     cont.appendChild(card);
@@ -755,13 +795,15 @@ function renderTareas() {
 // ── PILARES ──────────────────────────────────────────────
 function togglePilar(el) {
   const p = el.dataset.pilar;
-  state.pilares[p] = !state.pilares[p];
+  const d = getDayData(fechaActiva);
+  d.pilares[p] = !d.pilares[p];
   saveState(state);
   renderPilares();
 }
 function renderPilares() {
+  const d = getDayData(fechaActiva);
   document.querySelectorAll('.pilar').forEach(el => {
-    el.classList.toggle('done', !!state.pilares[el.dataset.pilar]);
+    el.classList.toggle('done', !!d.pilares[el.dataset.pilar]);
   });
 }
 
@@ -985,24 +1027,27 @@ function setGymTab(tab, btn) {
 }
 
 function toggleGymEx(key) {
-  state.gymDone[key] = !state.gymDone[key];
+  const d = getDayData(fechaActiva);
+  d.gymDone[key] = !d.gymDone[key];
   saveState(state);
   renderGymDone();
 }
 
 function savePeso(key, val) {
-  state.gymPesos[key] = val;
+  const d = getDayData(fechaActiva);
+  d.gymPesos[key] = val;
   saveState(state);
 }
 
 function renderGymDone() {
+  const d = getDayData(fechaActiva);
   ['d1','d2','d3','d4','abs'].forEach(day => {
     const count = GYM_COUNTS[day] || 0;
     let done = 0;
     for (let i = 0; i < count; i++) {
       const key = day+'-'+i;
       const btn = document.getElementById('gbtn-'+key);
-      const isDone = !!state.gymDone[key];
+      const isDone = !!d.gymDone[key];
       if (isDone) done++;
       if (btn) {
         btn.classList.toggle('done-ex', isDone);
@@ -1013,10 +1058,58 @@ function renderGymDone() {
     const fill = document.getElementById('gym-fill-'+day);
     if (fill) fill.style.width = (count ? Math.round(done/count*100) : 0)+'%';
   });
-  Object.entries(state.gymPesos).forEach(([key, val]) => {
+  Object.entries(d.gymPesos).forEach(([key, val]) => {
     const inp = document.getElementById('peso-'+key);
     if (inp && val) inp.value = val;
   });
+}
+
+// ── NAVEGACIÓN DE FECHAS ─────────────────────────────────
+function fechaLabel(key) {
+  const [y,m,d] = key.split('-').map(Number);
+  const fecha = new Date(y, m-1, d);
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const hoy = hoyKey();
+  const ayer = new Date(); ayer.setDate(ayer.getDate()-1);
+  const ayerKey = ayer.getFullYear()+'-'+String(ayer.getMonth()+1).padStart(2,'0')+'-'+String(ayer.getDate()).padStart(2,'0');
+  if (key === hoy) return '📅 HOY — '+dias[fecha.getDay()]+' '+d+' '+meses[m-1];
+  if (key === ayerKey) return '⬅️ AYER — '+dias[fecha.getDay()]+' '+d+' '+meses[m-1];
+  return dias[fecha.getDay()]+', '+d+' '+meses[m-1]+' '+y;
+}
+
+function navegarFecha(delta) {
+  const [y,m,d] = fechaActiva.split('-').map(Number);
+  const fecha = new Date(y, m-1, d);
+  fecha.setDate(fecha.getDate() + delta);
+  // No permitir fechas futuras
+  const hoy = new Date(); hoy.setHours(23,59,59,999);
+  if (fecha > hoy) return;
+  fechaActiva = fecha.getFullYear()+'-'+String(fecha.getMonth()+1).padStart(2,'0')+'-'+String(fecha.getDate()).padStart(2,'0');
+  renderFechaActiva();
+  renderTareas();
+  renderPilares();
+  renderGymDone();
+}
+
+function irAHoy() {
+  fechaActiva = hoyKey();
+  renderFechaActiva();
+  renderTareas();
+  renderPilares();
+  renderGymDone();
+}
+
+function renderFechaActiva() {
+  const hoy = hoyKey();
+  const esHoy = fechaActiva === hoy;
+  document.getElementById('fecha-activa-label').textContent = fechaLabel(fechaActiva);
+  document.getElementById('editando-badge').style.display = esHoy ? 'none' : 'inline-flex';
+  document.getElementById('hoy-btn').style.display = esHoy ? 'none' : 'block';
+  // Ocultar flecha derecha si estamos en hoy
+  const btns = document.querySelectorAll('.fecha-nav-btn');
+  if (btns[1]) btns[1].style.opacity = esHoy ? '0.3' : '1';
+  if (btns[1]) btns[1].style.pointerEvents = esHoy ? 'none' : 'auto';
 }
 
 // ── INIT ─────────────────────────────────────────────────
@@ -1024,6 +1117,7 @@ function init(){
   checkReset();
   setFecha();
   setSaludo();
+  renderFechaActiva();
   renderTareas();
   renderPilares();
   renderHabitos();
